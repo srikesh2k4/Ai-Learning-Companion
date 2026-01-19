@@ -1,10 +1,6 @@
-# ==================================
-# AI Learning Companion - .gitignore
-# ==================================
+# AI Learning Companion - Git Ignore
 
-# ==================================
-# OS Generated Files
-# ==================================
+# OS files
 .DS_Store
 .DS_Store?
 ._*
@@ -13,9 +9,7 @@
 ehthumbs.db
 Thumbs.db
 
-# ==================================
-# IDE / Editor
-# ==================================
+# IDE and editors
 .idea/
 .vscode/*
 !.vscode/extensions.json
@@ -27,9 +21,7 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
-# ==================================
-# Python / Backend
-# ==================================
+# Python backend
 __pycache__/
 *.py[cod]
 *$py.class
@@ -51,33 +43,31 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# Virtual environment
 venv/
 env/
 ENV/
 .venv/
 .env.local
 
-# Environment variables (keep .env.example)
+# Environment variables
 backend/.env
 .env
 
-# Pytest / Testing
+# Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 .nox/
 
-# Jupyter Notebook
+# Jupyter
 .ipynb_checkpoints/
 
-# mypy
+# Type checking
 .mypy_cache/
 
-# ==================================
-# Node / Frontend
-# ==================================
+# Node and frontend
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -93,11 +83,7 @@ frontend/coverage/
 frontend/libpeerconnection.log
 testem.log
 typings/
-
-# Angular CLI
 .angular/
-
-# Compiled output
 dist/
 tmp/
 out-tsc/
@@ -105,35 +91,27 @@ out-tsc/
 # Dependencies
 bower_components/
 
-# e2e
+# E2E tests
 e2e/*.js
 e2e/*.map
 
-# ==================================
 # Database
-# ==================================
 *.db
 *.sqlite
 *.sqlite3
 
-# ==================================
 # Logs
-# ==================================
 logs/
 *.log
 npm-debug.log*
 
-# ==================================
-# Runtime data
-# ==================================
+# Runtime
 pids/
 *.pid
 *.seed
 *.pid.lock
 
-# ==================================
 # Misc
-# ==================================
 .cache/
 *.bak
 *.tmp

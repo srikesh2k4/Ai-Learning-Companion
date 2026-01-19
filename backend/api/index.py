@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan."""
-    logger.info(f"🚀 Starting {settings.app_name}")
+    logger.info(f"Starting {settings.app_name}")
     
     # Initialize database
     sessionmanager.init()
@@ -41,12 +41,12 @@ async def lifespan(app: FastAPI):
     get_tutor_agent()
     get_problem_generator()
     
-    logger.info("✅ Application ready")
+    logger.info("Application ready")
     
     yield
     
     await sessionmanager.close()
-    logger.info("👋 Application shutdown")
+    logger.info("Application shutdown")
 
 # Create app
 app = FastAPI(
@@ -65,9 +65,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ============================================================================
-# AUTH ENDPOINTS
-# ============================================================================
+# Auth endpoints
 
 @app.post("/api/auth/register", response_model=Token, status_code=201)
 async def register(user_data: UserRegister, db: AsyncSession = Depends(get_db)):
@@ -127,9 +125,7 @@ async def update_profile(
     
     return UserResponse.model_validate(current_user)
 
-# ============================================================================
-# CONVERSATION ENDPOINTS
-# ============================================================================
+# Conversation endpoints
 
 @app.post("/api/conversations", response_model=ConversationResponse)
 async def create_conversation(
@@ -212,9 +208,7 @@ async def send_message(
     
     return MessageResponse.model_validate(ai_msg)
 
-# ============================================================================
-# PRACTICE ENDPOINTS
-# ============================================================================
+# Practice endpoints
 
 @app.post("/api/practice/generate", response_model=dict)
 async def generate_problem(
@@ -311,9 +305,7 @@ async def get_practice_history(
     
     return [PracticeSessionResponse.model_validate(s) for s in sessions]
 
-# ============================================================================
-# ANALYTICS ENDPOINTS
-# ============================================================================
+# Analytics endpoints
 
 @app.get("/api/stats", response_model=LearningStats)
 async def get_stats(
@@ -324,9 +316,7 @@ async def get_stats(
     stats = await LearningService.get_user_stats(db, current_user.id)
     return LearningStats(**stats)
 
-# ============================================================================
-# UTILITY ENDPOINTS
-# ============================================================================
+# Utility endpoints
 
 @app.get("/", response_model=HealthCheck)
 async def health():

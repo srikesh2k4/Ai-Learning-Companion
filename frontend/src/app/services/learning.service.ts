@@ -20,7 +20,7 @@ export class LearningService {
 
   constructor(private http: HttpClient) {}
 
-  // Conversations
+  // Conversation methods
   getConversations(): Observable<Conversation[]> {
     return this.http.get<Conversation[]>(`${this.apiUrl}/conversations`);
   }

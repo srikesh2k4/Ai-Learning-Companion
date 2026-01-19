@@ -10,14 +10,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Only add auth header in browser
   if (!isPlatformBrowser(platformId)) {
     return next(req);
   }
 
   const token = authService.getToken();
 
-  // Skip auth header for login, register and public endpoints
   if (token && !req.url.includes('/auth/login') && !req.url.includes('/auth/register') && !req.url.includes('/topics')) {
     req = req.clone({
       setHeaders: {
@@ -28,9 +26,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Only handle 401 in browser and not on auth endpoints
       if (error.status === 401 && isPlatformBrowser(platformId) && !req.url.includes('/auth/')) {
-        console.log('401 error - logging out');
         authService.logout();
         router.navigate(['/login']);
       }

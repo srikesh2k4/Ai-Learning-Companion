@@ -41,7 +41,6 @@ export class ProfileComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Only load data in browser
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }

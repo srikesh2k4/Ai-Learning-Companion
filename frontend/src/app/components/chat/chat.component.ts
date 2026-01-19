@@ -22,12 +22,9 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
   messages: Message[] = [];
   messageText = '';
   sendingMessage = false;
-
-  // Scroll control variables
   private shouldScrollToBottom = false;
   showScrollButton = false;
   private isUserAtBottom = true;
-
   private platformId = inject(PLATFORM_ID);
 
   constructor(
@@ -37,14 +34,12 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
     private ngZone: NgZone,
     private sanitizer: DomSanitizer
   ) {
-    // Configure marked options
     marked.setOptions({
       breaks: true,
       gfm: true,
     });
   }
 
-  // Parse markdown to HTML
   parseMarkdown(text: string): SafeHtml {
     try {
       const html = marked.parse(text) as string;
@@ -93,7 +88,6 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
   loadConversations(): void {
     this.learningService.getConversations().subscribe({
       next: (conversations) => {
-        console.log('Loaded conversations:', conversations);
         this.conversations = conversations;
         if (conversations.length > 0 && !this.currentConversation) {
           this.loadConversation(conversations[0].id);
@@ -155,8 +149,6 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
     };
 
     this.messages.push(userMessage);
-
-    // ALWAYS scroll when user sends
     this.shouldScrollToBottom = true;
     this.isUserAtBottom = true;
     this.showScrollButton = false;

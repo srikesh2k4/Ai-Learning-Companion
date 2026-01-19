@@ -3,9 +3,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional, Literal
 from datetime import datetime
 
-# ============================================================================
-# AUTH SCHEMAS
-# ============================================================================
+# Auth schemas
 
 class UserRegister(BaseModel):
     """User registration."""
@@ -57,9 +55,7 @@ class UserUpdate(BaseModel):
     learning_goals: Optional[str] = None
     preferred_topics: Optional[List[str]] = None
 
-# ============================================================================
-# CONVERSATION SCHEMAS
-# ============================================================================
+# Conversation schemas
 
 class MessageCreate(BaseModel):
     """Create message."""
@@ -96,9 +92,7 @@ class ConversationDetailResponse(BaseModel):
     created_at: datetime
     messages: List[MessageResponse]
 
-# ============================================================================
-# PRACTICE SCHEMAS
-# ============================================================================
+# Practice schemas
 
 class ProblemGenerateRequest(BaseModel):
     """Generate practice problem."""
@@ -140,9 +134,7 @@ class PracticeSessionResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# ============================================================================
-# ANALYTICS SCHEMAS
-# ============================================================================
+# Analytics schemas
 
 class LearningStats(BaseModel):
     """Learning statistics."""

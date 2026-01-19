@@ -8,7 +8,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Allow SSR to pass through
   if (!isPlatformBrowser(platformId)) {
     return true;
   }
@@ -26,7 +25,6 @@ export const publicGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Allow SSR to pass through
   if (!isPlatformBrowser(platformId)) {
     return true;
   }

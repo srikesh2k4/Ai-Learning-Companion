@@ -3,16 +3,11 @@
 .navbar {
   width: 100%;
   font-family: "Open Sans", sans-serif;
-
-  /* Correct frosted glass color */
-  background: rgba(250, 248, 255, 0.72); // near-white lavender
+  background: rgba(250, 248, 255, 0.72);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
-
-  /* Subtle definition */
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
@@ -25,7 +20,6 @@
   }
 }
 
-// Ghost Animation Container
 .navbar-brand {
   position: relative;
   display: flex;
@@ -35,12 +29,11 @@
   user-select: none;
   font-weight: 700;
   color: #1a1a1a;
-  overflow: hidden; // Contains the ghost animation
-  height: 50px; // Define height for ghost animation
-  padding-right: 2rem; // Extra space for ghost to pass through
+  overflow: hidden;
+  height: 50px;
+  padding-right: 2rem;
 }
 
-// Brand Text Container
 .brand-container {
   position: relative;
   display: flex;
@@ -61,7 +54,6 @@
   user-select: none;
 }
 
-// Ghost Animation - CHANGED: 8s to 20s
 .ghost {
   width: 3.5vmin;
   height: 5vmin;
@@ -77,9 +69,9 @@
   margin-top: -2.5vmin;
   opacity: 0.9;
   mix-blend-mode: exclusion;
-  animation: ghostMove 20s ease-in-out infinite; // CHANGED: 8s → 20s
+  animation: ghostMove 20s ease-in-out infinite;
   z-index: 2;
-  pointer-events: none; // Don't interfere with clicks
+  pointer-events: none;
 }
 
 @keyframes ghostMove {
@@ -152,7 +144,6 @@
       color: #5b6cff;
     }
 
-    /* ✅ ACTIVE STATE */
     &.active {
       color: #5b6cff;
     }
