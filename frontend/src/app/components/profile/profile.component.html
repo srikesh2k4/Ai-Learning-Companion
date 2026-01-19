@@ -1,0 +1,170 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>⚙️ Profile Settings</h1>
+    <p>Manage your account and preferences</p>
+  </div>
+
+  <div class="profile-content">
+    <!-- Profile Card -->
+    <div class="section-card">
+      <div class="profile-avatar-section">
+        <div class="large-avatar">
+          {{ currentUser?.username?.charAt(0)?.toUpperCase() }}
+        </div>
+        <div class="avatar-info">
+          <h2>{{ currentUser?.full_name }}</h2>
+          <p>&#64;{{ currentUser?.username }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="section-card">
+      <h2>Personal Information</h2>
+
+      <form (ngSubmit)="updateProfile()" class="profile-form">
+        <div class="form-group">
+          <label for="full_name">Full Name</label>
+          <input
+            type="text"
+            id="full_name"
+            [(ngModel)]="formData.full_name"
+            name="full_name"
+            placeholder="Your full name"
+            [disabled]="updating"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="formData.email"
+            name="email"
+            placeholder="your@email.com"
+            [disabled]="updating"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            [value]="currentUser?.username"
+            disabled
+            class="disabled-input"
+          />
+          <small>Username cannot be changed</small>
+        </div>
+
+        @if (successMessage) {
+          <div class="success-message">
+            ✅ {{ successMessage }}
+          </div>
+        }
+
+        @if (errorMessage) {
+          <div class="error-message">
+            ⚠️ {{ errorMessage }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="updating"
+        >
+          @if (!updating) {
+            <span>Save Changes</span>
+          } @else {
+            <span class="loading-text">
+              <span class="spinner-inline"></span>
+              Saving...
+            </span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Learning Preferences -->
+    <div class="section-card">
+      <h2>Learning Goals</h2>
+
+      <form (ngSubmit)="updateGoals()" class="goals-form">
+        <div class="form-group">
+          <label for="learning_goals">What do you want to achieve?</label>
+          <textarea
+            id="learning_goals"
+            [(ngModel)]="formData.learning_goals"
+            name="learning_goals"
+            placeholder="e.g., Master Python, Learn Data Structures, Prepare for interviews..."
+            rows="5"
+            [disabled]="updating"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Preferred Topics</label>
+          <div class="topic-selector">
+            @for (topic of availableTopics; track topic) {
+              <div class="topic-checkbox">
+                <input
+                  type="checkbox"
+                  [id]="'topic-' + topic"
+                  [checked]="isTopicSelected(topic)"
+                  (change)="toggleTopic(topic)"
+                  [disabled]="updating"
+                />
+                <label [for]="'topic-' + topic">{{ topic }}</label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="updating"
+        >
+          @if (!updating) {
+            <span>Update Goals</span>
+          } @else {
+            <span>Updating...</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="section-card stats-card">
+      <h2>Account Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <div class="stat-label">Member Since</div>
+            <div class="stat-value">{{ formatDate(currentUser?.created_at) }}</div>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-label">Account Status</div>
+            <div class="stat-value">Active</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="section-card danger-zone">
+      <h2>⚠️ Danger Zone</h2>
+      <p>These actions are irreversible. Please be careful.</p>
+      <button class="btn-danger" (click)="confirmLogout()">
+        🚪 Logout from All Devices
+      </button>
+    </div>
+  </div>
+</div>

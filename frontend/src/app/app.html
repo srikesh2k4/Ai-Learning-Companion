@@ -1,0 +1,8 @@
+<div class="app-container">
+  @if (showNavbar) {
+    <app-navbar></app-navbar>
+  }
+  <main class="main-content" [class.no-navbar]="!showNavbar">
+    <router-outlet></router-outlet>
+  </main>
+</div>

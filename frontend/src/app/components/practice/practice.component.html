@@ -1,0 +1,189 @@
+<div class="practice-container">
+  <div class="practice-header">
+    <h1>📝 Practice Zone</h1>
+    <p>Generate problems and test your knowledge</p>
+  </div>
+
+  <!-- Problem Generator -->
+  @if (!currentProblem) {
+    <div class="section-card">
+      <h2>Generate Practice Problem</h2>
+
+      <form (ngSubmit)="generateProblem()" class="generator-form">
+        <div class="form-group">
+          <label for="topic">Topic</label>
+          <select
+            id="topic"
+            [(ngModel)]="selectedTopic"
+            name="topic"
+            [disabled]="generating"
+          >
+            <option value="">Select a topic</option>
+            @for (topic of topics; track topic) {
+              <option [value]="topic">{{ topic }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Difficulty</label>
+          <div class="difficulty-buttons">
+            @for (diff of difficulties; track diff) {
+              <button
+                type="button"
+                class="difficulty-btn"
+                [class.active]="selectedDifficulty === diff"
+                (click)="selectedDifficulty = diff"
+                [disabled]="generating"
+              >
+                {{ diff }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary btn-large"
+          [disabled]="!selectedTopic || generating"
+        >
+          @if (!generating) {
+            <span>Generate Problem</span>
+          } @else {
+            <span class="loading-text">
+              <span class="spinner-inline"></span>
+              Generating...
+            </span>
+          }
+        </button>
+      </form>
+    </div>
+  }
+
+  <!-- Current Problem -->
+  @if (currentProblem && !showFeedback) {
+    <div class="section-card problem-card">
+      <div class="problem-header">
+        <div class="problem-badges">
+          <span class="badge topic-badge">{{ currentProblem.problem.topic }}</span>
+          <span class="badge difficulty-badge" [ngClass]="'difficulty-' + currentProblem.problem.difficulty">
+            {{ currentProblem.problem.difficulty }}
+          </span>
+        </div>
+      </div>
+
+      <div class="problem-text">
+        {{ currentProblem.problem.problem_text }}
+      </div>
+
+      @if (currentProblem.problem.hints.length > 0) {
+        <div class="hints-section">
+          <button class="btn-hint" (click)="showHints = !showHints">
+            💡 {{ showHints ? 'Hide' : 'Show' }} Hints
+          </button>
+          @if (showHints) {
+            <div class="hints-list">
+              @for (hint of currentProblem.problem.hints; track $index; let i = $index) {
+                <div class="hint-item">
+                  <strong>Hint {{ i + 1 }}:</strong> {{ hint }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <form (ngSubmit)="submitAnswer()" class="answer-form">
+        <div class="form-group">
+          <label for="answer">Your Answer</label>
+          <textarea
+            id="answer"
+            [(ngModel)]="userAnswer"
+            name="answer"
+            placeholder="Write your answer here..."
+            rows="6"
+            [disabled]="submitting"
+          ></textarea>
+        </div>
+
+        <div class="button-group">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="!userAnswer.trim() || submitting"
+          >
+            @if (!submitting) {
+              <span>Submit Answer</span>
+            } @else {
+              <span>Checking...</span>
+            }
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancelProblem()"
+            [disabled]="submitting"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Feedback -->
+  @if (showFeedback && feedback) {
+    <div class="section-card feedback-card">
+      <div class="feedback-header">
+        <div class="feedback-icon" [class.correct]="feedback.is_correct" [class.incorrect]="!feedback.is_correct">
+          {{ feedback.is_correct ? '✅' : '❌' }}
+        </div>
+        <h2>{{ feedback.is_correct ? 'Great job!' : 'Keep practicing!' }}</h2>
+      </div>
+
+      <div class="score-display">
+        <div class="score-circle">
+          <span class="score-value">{{ feedback.score }}</span>
+          <span class="score-label">/100</span>
+        </div>
+      </div>
+
+      <div class="feedback-text">
+        <h3>Feedback</h3>
+        <p>{{ feedback.feedback }}</p>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary" (click)="tryAnother()">
+          Try Another Problem
+        </button>
+        <button class="btn-secondary" (click)="viewHistory()">
+          View History
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Practice History -->
+  @if (history.length > 0 && !currentProblem) {
+    <div class="section-card">
+      <h2>📊 Recent Practice</h2>
+      <div class="history-list">
+        @for (session of history; track session.id) {
+          <div class="history-item">
+            <div class="history-header">
+              <span class="history-topic">{{ session.topic }}</span>
+              @if (session.score !== null && session.score !== undefined) {
+                <span class="history-score">{{ session.score }}%</span>
+              }
+            </div>
+            <div class="history-meta">
+              <span class="history-difficulty">{{ session.difficulty }}</span>
+              <span class="history-date">{{ formatDate(session.created_at) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

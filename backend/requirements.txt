@@ -1,0 +1,24 @@
+# Core
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+
+# Pydantic
+pydantic>=2.11.0
+pydantic-settings>=2.6.1
+pydantic-ai>=0.0.14
+
+# Database
+sqlalchemy[asyncio]>=2.0.35
+aiosqlite>=0.20.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# HTTP & Utilities
+httpx>=0.28.1
+tenacity>=9.0.0
+
+# Rate Limiting
+slowapi>=0.1.9
