@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, AfterViewInit, PLATFORM_ID, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { Message, Conversation } from '../../models/types';
+import { marked } from 'marked';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chat',
@@ -12,7 +14,7 @@ import { Message, Conversation } from '../../models/types';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent implements OnInit, AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
   conversations: Conversation[] = [];
@@ -20,23 +22,46 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   messages: Message[] = [];
   messageText = '';
   sendingMessage = false;
+
+  // Scroll control variables
   private shouldScrollToBottom = false;
+  showScrollButton = false;
+  private isUserAtBottom = true;
+
   private platformId = inject(PLATFORM_ID);
 
   constructor(
     private learningService: LearningService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private sanitizer: DomSanitizer
+  ) {
+    // Configure marked options
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+    });
+  }
+
+  // Parse markdown to HTML
+  parseMarkdown(text: string): SafeHtml {
+    try {
+      const html = marked.parse(text) as string;
+      return this.sanitizer.bypassSecurityTrustHtml(html);
+    } catch (error) {
+      console.error('Markdown parsing error:', error);
+      return text;
+    }
+  }
 
   ngOnInit(): void {
-    // Only load data in browser
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
 
     this.loadConversations();
 
-    // Check if conversation ID in route
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.loadConversation(+params['id']);
@@ -44,22 +69,39 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        if (this.messagesContainer && this.messages.length > 0) {
+          this.checkScrollPosition();
+        }
+      }, 300);
+    }
+  }
+
   ngAfterViewChecked(): void {
-    if (this.shouldScrollToBottom) {
+    if (this.shouldScrollToBottom && this.messagesContainer) {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
+
+      setTimeout(() => {
+        this.checkScrollPosition();
+      }, 100);
     }
   }
 
   loadConversations(): void {
     this.learningService.getConversations().subscribe({
       next: (conversations) => {
+        console.log('Loaded conversations:', conversations);
         this.conversations = conversations;
         if (conversations.length > 0 && !this.currentConversation) {
           this.loadConversation(conversations[0].id);
         }
       },
-      error: (err) => console.error('Failed to load conversations', err)
+      error: (err) => {
+        console.error('Failed to load conversations', err);
+      }
     });
   }
 
@@ -75,6 +117,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         };
         this.messages = conversation.messages;
         this.shouldScrollToBottom = true;
+        this.isUserAtBottom = true;
+        this.showScrollButton = false;
+
+        setTimeout(() => {
+          this.checkScrollPosition();
+        }, 300);
       },
       error: (err) => console.error('Failed to load conversation', err)
     });
@@ -87,6 +135,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.currentConversation = conversation;
         this.messages = [];
         this.messageText = '';
+        this.isUserAtBottom = true;
+        this.showScrollButton = false;
       },
       error: (err) => console.error('Failed to create conversation', err)
     });
@@ -105,7 +155,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
 
     this.messages.push(userMessage);
+
+    // ALWAYS scroll when user sends
     this.shouldScrollToBottom = true;
+    this.isUserAtBottom = true;
+    this.showScrollButton = false;
 
     const messageContent = this.messageText;
     this.messageText = '';
@@ -115,7 +169,20 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       next: (response) => {
         this.messages.push(response);
         this.sendingMessage = false;
-        this.shouldScrollToBottom = true;
+
+        setTimeout(() => {
+          this.checkScrollPosition();
+
+          if (this.isUserAtBottom) {
+            this.shouldScrollToBottom = true;
+            this.showScrollButton = false;
+          } else {
+            this.showScrollButton = true;
+          }
+          this.cdr.detectChanges();
+        }, 50);
+
+        this.updateConversationMessageCount();
       },
       error: (err) => {
         console.error('Failed to send message', err);
@@ -124,12 +191,66 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  private checkScrollPosition(): void {
+    if (!this.messagesContainer) {
+      return;
+    }
+
+    const element = this.messagesContainer.nativeElement;
+    const threshold = 50;
+
+    const scrollPosition = element.scrollTop + element.clientHeight;
+    const scrollHeight = element.scrollHeight;
+    const distanceFromBottom = scrollHeight - scrollPosition;
+
+    this.isUserAtBottom = distanceFromBottom <= threshold;
+
+    const shouldShow = !this.isUserAtBottom && this.messages.length > 0;
+
+    if (this.showScrollButton !== shouldShow) {
+      this.showScrollButton = shouldShow;
+      this.cdr.detectChanges();
+    }
+  }
+
+  onScroll(): void {
+    this.ngZone.run(() => {
+      this.checkScrollPosition();
+    });
+  }
+
+  scrollToBottomClick(): void {
+    this.scrollToBottom();
+
+    setTimeout(() => {
+      this.checkScrollPosition();
+    }, 400);
+  }
+
+  updateConversationMessageCount(): void {
+    if (this.currentConversation) {
+      const conv = this.conversations.find(c => c.id === this.currentConversation!.id);
+      if (conv) {
+        conv.message_count = this.messages.length;
+      }
+      this.currentConversation.message_count = this.messages.length;
+    }
+  }
+
   scrollToBottom(): void {
     try {
-      this.messagesContainer.nativeElement.scrollTop =
-        this.messagesContainer.nativeElement.scrollHeight;
+      if (this.messagesContainer) {
+        const element = this.messagesContainer.nativeElement;
+        element.scrollTo({
+          top: element.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     } catch (err) {
-      // Handle error silently
+      if (this.messagesContainer) {
+        this.messagesContainer.nativeElement.scrollTop =
+          this.messagesContainer.nativeElement.scrollHeight;
+      }
     }
   }
 

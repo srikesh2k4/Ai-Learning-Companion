@@ -1,13 +1,14 @@
 import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MarkdownComponent } from 'ngx-markdown';
 import { LearningService } from '../../services/learning.service';
 import { GeneratedProblem, PracticeSession, SubmitAnswerResponse } from '../../models/types';
 
 @Component({
   selector: 'app-practice',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MarkdownComponent],
   templateUrl: './practice.component.html',
   styleUrl: './practice.component.scss'
 })
@@ -31,7 +32,6 @@ export class PracticeComponent implements OnInit {
   constructor(private learningService: LearningService) {}
 
   ngOnInit(): void {
-    // Only load data in browser
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }

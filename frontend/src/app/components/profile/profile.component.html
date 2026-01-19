@@ -1,6 +1,6 @@
 <div class="profile-container">
   <div class="profile-header">
-    <h1>⚙️ Profile Settings</h1>
+    <h1>Profile Settings</h1>
     <p>Manage your account and preferences</p>
   </div>
 
@@ -61,13 +61,13 @@
 
         @if (successMessage) {
           <div class="success-message">
-            ✅ {{ successMessage }}
+            {{ successMessage }}
           </div>
         }
 
         @if (errorMessage) {
           <div class="error-message">
-            ⚠️ {{ errorMessage }}
+            {{ errorMessage }}
           </div>
         }
 
@@ -142,14 +142,12 @@
       <h2>Account Statistics</h2>
       <div class="stats-grid">
         <div class="stat-item">
-          <div class="stat-icon">📅</div>
           <div class="stat-info">
             <div class="stat-label">Member Since</div>
             <div class="stat-value">{{ formatDate(currentUser?.created_at) }}</div>
           </div>
         </div>
         <div class="stat-item">
-          <div class="stat-icon">✅</div>
           <div class="stat-info">
             <div class="stat-label">Account Status</div>
             <div class="stat-value">Active</div>
@@ -160,10 +158,10 @@
 
     <!-- Danger Zone -->
     <div class="section-card danger-zone">
-      <h2>⚠️ Danger Zone</h2>
+      <h2>Danger Zone</h2>
       <p>These actions are irreversible. Please be careful.</p>
       <button class="btn-danger" (click)="confirmLogout()">
-        🚪 Logout from All Devices
+        Logout from All Devices
       </button>
     </div>
   </div>

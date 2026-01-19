@@ -1,15 +1,5 @@
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #0f172a;
-}
+@use '../styles/mixin' as *;
 
-.main-content {
-  flex: 1;
-  padding-top: 64px;
-
-  &.no-navbar {
-    padding-top: 0;
-  }
+.light-bg{
+  @include light-bg;
 }

@@ -58,6 +58,8 @@ export class AuthService {
   }
 
   logout(): void {
+    console.log('logout() called');
+    console.trace('logout call stack');
     if (this.isBrowser()) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -68,7 +70,9 @@ export class AuthService {
 
   getToken(): string | null {
     if (!this.isBrowser()) return null;
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    console.log('getToken called, token exists:', !!token);
+    return token;
   }
 
   isAuthenticated(): boolean {

@@ -12,6 +12,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
+  isDark = true;
+
   formData = {
     username: '',
     email: '',
@@ -26,6 +28,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router
   ) {}
+  
 
   onSubmit(): void {
     if (!this.formData.username || !this.formData.email ||

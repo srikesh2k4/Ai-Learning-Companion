@@ -1,6 +1,6 @@
 <div class="practice-container">
   <div class="practice-header">
-    <h1>📝 Practice Zone</h1>
+    <h1>Practice Zone</h1>
     <p>Generate problems and test your knowledge</p>
   </div>
 
@@ -79,7 +79,7 @@
       @if (currentProblem.problem.hints.length > 0) {
         <div class="hints-section">
           <button class="btn-hint" (click)="showHints = !showHints">
-            💡 {{ showHints ? 'Hide' : 'Show' }} Hints
+            {{ showHints ? 'Hide' : 'Show' }} Hints
           </button>
           @if (showHints) {
             <div class="hints-list">
@@ -131,14 +131,13 @@
     </div>
   }
 
-  <!-- Feedback -->
+  <!-- Feedback with Markdown -->
   @if (showFeedback && feedback) {
-    <div class="section-card feedback-card">
+    <div class="section-card feedback-card" [class.correct]="feedback.is_correct" [class.incorrect]="!feedback.is_correct">
       <div class="feedback-header">
-        <div class="feedback-icon" [class.correct]="feedback.is_correct" [class.incorrect]="!feedback.is_correct">
-          {{ feedback.is_correct ? '✅' : '❌' }}
+        <div class="feedback-status">
+          <h2>{{ feedback.is_correct ? 'Great job!' : 'Keep practicing!' }}</h2>
         </div>
-        <h2>{{ feedback.is_correct ? 'Great job!' : 'Keep practicing!' }}</h2>
       </div>
 
       <div class="score-display">
@@ -148,9 +147,10 @@
         </div>
       </div>
 
+      <!-- FIXED: Using markdown component instead of plain <p> -->
       <div class="feedback-text">
         <h3>Feedback</h3>
-        <p>{{ feedback.feedback }}</p>
+        <markdown [data]="feedback.feedback"></markdown>
       </div>
 
       <div class="button-group">
@@ -165,25 +165,31 @@
   }
 
   <!-- Practice History -->
-  @if (history.length > 0 && !currentProblem) {
+  @if (!currentProblem && !showFeedback) {
     <div class="section-card">
-      <h2>📊 Recent Practice</h2>
-      <div class="history-list">
-        @for (session of history; track session.id) {
-          <div class="history-item">
-            <div class="history-header">
-              <span class="history-topic">{{ session.topic }}</span>
-              @if (session.score !== null && session.score !== undefined) {
-                <span class="history-score">{{ session.score }}%</span>
-              }
+      <h2>Recent Practice</h2>
+      @if (history.length > 0) {
+        <div class="history-list">
+          @for (session of history; track session.id) {
+            <div class="history-item">
+              <div class="history-header">
+                <span class="history-topic">{{ session.topic }}</span>
+                @if (session.score !== null && session.score !== undefined) {
+                  <span class="history-score">{{ session.score }}%</span>
+                }
+              </div>
+              <div class="history-meta">
+                <span class="history-difficulty">{{ session.difficulty }}</span>
+                <span class="history-date">{{ formatDate(session.created_at) }}</span>
+              </div>
             </div>
-            <div class="history-meta">
-              <span class="history-difficulty">{{ session.difficulty }}</span>
-              <span class="history-date">{{ formatDate(session.created_at) }}</span>
-            </div>
-          </div>
-        }
-      </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>No practice history yet. Generate a problem and start practicing!</p>
+        </div>
+      }
     </div>
   }
 </div>

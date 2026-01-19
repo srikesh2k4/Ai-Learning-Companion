@@ -37,23 +37,30 @@ export class DashboardComponent implements OnInit {
 
   loadDashboardData(): void {
     this.loading = true;
+    console.log('Loading dashboard data...');
 
     // Load stats
     this.learningService.getStats().subscribe({
       next: (stats) => {
+        console.log('Stats loaded:', stats);
         this.stats = stats;
       },
-      error: (err) => console.error('Failed to load stats', err)
+      error: (err) => {
+        console.error('Failed to load stats', err);
+        console.log('Stats error status:', err.status);
+      }
     });
 
     // Load recent conversations
     this.learningService.getConversations().subscribe({
       next: (conversations) => {
+        console.log('Conversations loaded:', conversations);
         this.recentConversations = conversations.slice(0, 5);
         this.loading = false;
       },
       error: (err) => {
         console.error('Failed to load conversations', err);
+        console.log('Conversations error status:', err.status);
         this.loading = false;
       }
     });

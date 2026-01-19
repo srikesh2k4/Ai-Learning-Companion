@@ -1,7 +1,7 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <div class="welcome-section">
-      <h1>Welcome back, {{ currentUser?.full_name || currentUser?.username }}! 👋</h1>
+      <h1>Welcome back, {{ currentUser?.full_name || currentUser?.username }}</h1>
       <p>Ready to continue your learning journey?</p>
     </div>
   </div>
@@ -9,34 +9,30 @@
   @if (stats) {
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">💬</div>
         <div class="stat-content">
-          <div class="stat-value">{{ stats.total_conversations }}</div>
           <div class="stat-label">Conversations</div>
+          <div class="stat-value">{{ stats.total_conversations }}</div>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📝</div>
         <div class="stat-content">
-          <div class="stat-value">{{ stats.total_practice_sessions }}</div>
           <div class="stat-label">Practice Sessions</div>
+          <div class="stat-value">{{ stats.total_practice_sessions }}</div>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">✅</div>
         <div class="stat-content">
-          <div class="stat-value">{{ stats.practice_sessions_completed }}</div>
           <div class="stat-label">Completed</div>
+          <div class="stat-value">{{ stats.practice_sessions_completed }}</div>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🎯</div>
         <div class="stat-content">
-          <div class="stat-value">{{ stats.average_score }}%</div>
           <div class="stat-label">Average Score</div>
+          <div class="stat-value">{{ stats.average_score }}%</div>
         </div>
       </div>
     </div>
@@ -45,22 +41,19 @@
   <div class="dashboard-content">
     <!-- Quick Actions -->
     <div class="section-card">
-      <h2>🚀 Quick Actions</h2>
+      <h2>Quick Actions</h2>
       <div class="action-grid">
         <a routerLink="/chat" class="action-card">
-          <div class="action-icon">💬</div>
           <h3>Start Chat</h3>
           <p>Ask questions and learn with AI</p>
         </a>
 
         <a routerLink="/practice" class="action-card">
-          <div class="action-icon">📝</div>
           <h3>Practice</h3>
           <p>Generate practice problems</p>
         </a>
 
         <a routerLink="/profile" class="action-card">
-          <div class="action-icon">⚙️</div>
           <h3>Settings</h3>
           <p>Update your profile</p>
         </a>
@@ -71,13 +64,12 @@
     @if (recentConversations.length > 0) {
       <div class="section-card">
         <div class="section-header">
-          <h2>💭 Recent Conversations</h2>
+          <h2>Recent Conversations</h2>
           <a routerLink="/chat" class="view-all">View All →</a>
         </div>
         <div class="conversation-list">
           @for (conv of recentConversations; track conv.id) {
             <a [routerLink]="['/chat', conv.id]" class="conversation-item">
-              <div class="conversation-icon">💬</div>
               <div class="conversation-content">
                 <div class="conversation-title">{{ conv.title }}</div>
                 <div class="conversation-meta">
@@ -93,7 +85,7 @@
     <!-- Topics Practiced -->
     @if (stats && stats.topics_practiced.length > 0) {
       <div class="section-card">
-        <h2>📚 Topics You've Practiced</h2>
+        <h2>Topics You've Practiced</h2>
         <div class="topic-chips">
           @for (topic of stats.topics_practiced; track topic) {
             <span class="topic-chip">{{ topic }}</span>
@@ -104,7 +96,7 @@
 
     <!-- Learning Goals -->
     <div class="section-card goals-card">
-      <h2>🎯 Your Learning Goals</h2>
+      <h2>Your Learning Goals</h2>
       <div class="goals-content">
         @if (currentUser?.learning_goals) {
           <p>{{ currentUser?.learning_goals }}</p>

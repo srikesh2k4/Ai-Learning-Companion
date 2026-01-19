@@ -1,0 +1,33 @@
+@mixin light-bg {
+  min-height: 100vh;
+
+  background:
+    /* soft lavender glow (top-left) */
+    radial-gradient(
+      circle at 18% 12%,
+      rgba(225, 215, 255, 0.45),
+      transparent 60%
+    ),
+
+    /* cool blue haze (center-right) */
+    radial-gradient(
+      circle at 78% 40%,
+      rgba(210, 225, 255, 0.35),
+      transparent 65%
+    ),
+
+    /* warm peach tint (bottom-left) */
+    radial-gradient(
+      circle at 30% 85%,
+      rgba(255, 225, 215, 0.35),
+      transparent 60%
+    ),
+
+    /* base gradient */
+    linear-gradient(
+      135deg,
+      #f6f4fb 0%,
+      #eef2f8 45%,
+      #f7f5fa 100%
+    );
+}

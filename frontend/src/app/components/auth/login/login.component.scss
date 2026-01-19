@@ -1,128 +1,139 @@
+@use '../../../../styles/mixin' as *;
+
+.light-bg{
+  @include light-bg;
+}
 .auth-container {
-  min-height: 100vh;
+  font-family: 'Open Sans', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  min-height: 100vh;
 }
 
 .auth-card {
-  background: white;
-  border-radius: 24px;
-  padding: 48px;
-  width: 100%;
-  max-width: 440px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgb(6, 0, 0);
+  width: 30rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
 }
 
 .auth-header {
-  text-align: center;
-  margin-bottom: 40px;
-
-  .logo {
-    font-size: 64px;
-    margin-bottom: 16px;
-  }
-
   h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 8px;
+    margin-top: 1rem;
+    letter-spacing: 0.2rem;
+    text-align: center;
+    color: rgb(6, 0, 0);
+    font-size: 2.4rem;
   }
 
   p {
-    font-size: 16px;
-    color: #6b7280;
+    text-align: center;
+    color: rgb(6, 0, 0);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    width: 80%;
   }
 }
 
 .form-group {
-  margin-bottom: 24px;
-
   label {
-    display: block;
-    font-size: 14px;
+    margin-bottom: 0.5rem;
+    color: rgb(6, 0, 0);
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
   }
 
   input {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 16px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    transition: all 0.2s;
-    font-family: inherit;
-    box-sizing: border-box;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #0c0000;
+    font-size: 1rem;
 
     &:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      border-bottom: 1px solid #051aff;
     }
 
     &:disabled {
-      background: #f9fafb;
+      opacity: 0.6;
       cursor: not-allowed;
     }
   }
 }
 
-.error-message {
-  background: #fee2e2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  font-size: 14px;
-}
-
 .btn-primary {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: rgb(6, 0, 0);
   border: none;
-  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s;
+  width: 80%;
+  margin-top: 1rem;
+  letter-spacing: 0.1rem;
+  box-shadow: 0 4px 12px rgba(6, 0, 0, 0.3);
 
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+  &:hover {
+    color: rgb(6, 0, 0);
+    background-color: rgb(255, 255, 255);
   }
 
   &:disabled {
-    opacity: 0.6;
     cursor: not-allowed;
+    opacity: 0.85;
   }
 }
 
 .loading-spinner {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
   display: inline-block;
-  animation: pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  width: 80%;
+  margin-bottom: 0.5rem;
+  color: #c40000;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .auth-footer {
-  margin-top: 32px;
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
+  margin-bottom: 1rem;
+
+  p {
+    text-align: center;
+    margin-top: 1rem;
+    color: rgb(6, 0, 0);
+  }
 
   a {
-    color: #667eea;
+    color: rgb(6, 0, 0);
     text-decoration: none;
     font-weight: 600;
 

@@ -28,9 +28,10 @@ class LearningService:
     
     @staticmethod
     async def get_user_conversations(db: AsyncSession, user_id: int) -> List[Conversation]:
-        """Get user conversations."""
+        """Get user conversations with message count."""
         result = await db.execute(
             select(Conversation)
+            .options(selectinload(Conversation.messages))
             .where(Conversation.user_id == user_id)
             .order_by(desc(Conversation.updated_at))
         )
