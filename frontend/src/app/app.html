@@ -1,8 +1,21 @@
-<div class="app-container light-bg">
-  @if (showNavbar) {
-    <app-navbar></app-navbar>
-  }
-  <main class="main-content" [class.no-navbar]="!showNavbar">
-    <router-outlet></router-outlet>
-  </main>
-</div>
+@defer{
+  <div class="app-container light-bg">
+    @if (showNavbar) {
+      <app-navbar></app-navbar>
+    }
+
+    <main class="main-content" [class.no-navbar]="!showNavbar">
+      <router-outlet></router-outlet>
+    </main>
+
+    @if (showAiAgent) {
+      <app-ai-agent></app-ai-agent>
+    }
+  </div>
+}
+@placeholder {
+  <app-loading></app-loading>
+}
+@loading (minimum 2s){
+  <app-loading></app-loading>
+}

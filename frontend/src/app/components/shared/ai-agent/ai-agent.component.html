@@ -1,0 +1,103 @@
+@if (isAuthenticated) {
+  <!-- Minimized Bubble -->
+  @if (isMinimized) {
+    <div class="ai-agent-minimized" (click)="toggleExpand()">
+      <div class="mini-orb">
+        <div class="mini-glow"></div>
+        <div class="mini-core"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Floating Agent -->
+  @if (!isMinimized && !isExpanded) {
+    <div class="ai-agent-container" [class]="state">
+      <div class="ai-agent" (click)="toggleExpand()">
+        <div class="agent-glow"></div>
+        <div class="agent-core">
+          <div class="agent-face">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+          </div>
+        </div>
+        <div class="agent-ring"></div>
+      </div>
+
+      @if (currentSuggestion) {
+        <div class="suggestion-bubble" (click)="toggleExpand()">
+          <p>{{ currentSuggestion }}</p>
+          <span class="tap-hint">Tap to expand</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Expanded Chat Panel -->
+  @if (isExpanded) {
+    <div class="ai-agent-panel">
+      <div class="panel-header">
+        <div class="header-left">
+          <div class="mini-agent" [class]="state">
+            <div class="mini-glow"></div>
+            <div class="mini-core"></div>
+          </div>
+          <div class="header-info">
+            <h3>AI Learning Assistant</h3>
+            <span class="status">{{ state === 'thinking' ? 'Thinking...' : 'Online' }}</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-minimize" (click)="minimize()" title="Minimize">−</button>
+          <button class="btn-close" (click)="close()" title="Close">×</button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div class="messages-container">
+          @for (msg of messages; track $index) {
+            <div class="message" [class.user]="msg.role === 'user'" [class.agent]="msg.role === 'agent'">
+              @if (msg.role === 'agent') {
+                <div class="msg-avatar">
+                  <div class="tiny-orb"></div>
+                </div>
+              }
+              <div class="msg-content markdown-content" [innerHTML]="parseMarkdown(msg.content)"></div>
+            </div>
+          }
+
+          @if (isLoading) {
+            <div class="message agent">
+              <div class="msg-avatar">
+                <div class="tiny-orb thinking"></div>
+              </div>
+              <div class="msg-content typing">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <form (ngSubmit)="sendMessage()" class="input-form">
+          <input
+            type="text"
+            [(ngModel)]="userInput"
+            name="userInput"
+            placeholder="Ask me anything..."
+            [disabled]="isLoading"
+            autocomplete="off"
+          />
+          <button type="submit" [disabled]="!userInput.trim() || isLoading">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+}
