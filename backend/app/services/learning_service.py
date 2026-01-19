@@ -48,6 +48,22 @@ class LearningService:
         return result.scalar_one_or_none()
     
     @staticmethod
+    async def delete_conversation(db: AsyncSession, conv_id: int, user_id: int) -> bool:
+        """Delete a conversation and its messages."""
+        result = await db.execute(
+            select(Conversation)
+            .where(Conversation.id == conv_id, Conversation.user_id == user_id)
+        )
+        conv = result.scalar_one_or_none()
+        
+        if not conv:
+            return False
+        
+        await db.delete(conv)
+        await db.commit()
+        return True
+    
+    @staticmethod
     async def add_message(db: AsyncSession, conv_id: int, role: str, content: str) -> Message:
         """Add message to conversation."""
         message = Message(

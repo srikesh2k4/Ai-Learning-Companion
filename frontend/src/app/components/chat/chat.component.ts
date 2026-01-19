@@ -250,4 +250,34 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
+
+  truncateTitle(title: string, maxLength: number = 25): string {
+    if (!title) return 'New Conversation';
+    if (title.length <= maxLength) return title;
+    return title.substring(0, maxLength) + '...';
+  }
+
+  deleteConversation(id: number, event: Event): void {
+    event.stopPropagation();
+
+    if (!confirm('Are you sure you want to delete this conversation?')) {
+      return;
+    }
+
+    this.learningService.deleteConversation(id).subscribe({
+      next: () => {
+        this.conversations = this.conversations.filter(c => c.id !== id);
+
+        if (this.currentConversation?.id === id) {
+          this.currentConversation = null;
+          this.messages = [];
+
+          if (this.conversations.length > 0) {
+            this.loadConversation(this.conversations[0].id);
+          }
+        }
+      },
+      error: (err) => console.error('Failed to delete conversation', err)
+    });
+  }
 }

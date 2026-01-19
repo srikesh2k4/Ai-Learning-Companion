@@ -183,6 +183,20 @@ async def get_conversation(
         messages=[MessageResponse.model_validate(m) for m in conv.messages]
     )
 
+@app.delete("/api/conversations/{conv_id}", status_code=204)
+async def delete_conversation(
+    conv_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a conversation."""
+    deleted = await LearningService.delete_conversation(db, conv_id, current_user.id)
+    
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    return None
+
 @app.post("/api/conversations/{conv_id}/messages", response_model=MessageResponse)
 async def send_message(
     conv_id: int,

@@ -14,9 +14,16 @@
           (click)="loadConversation(conv.id)"
         >
           <div class="conv-content">
-            <div class="conv-title">{{ conv.title }}</div>
+            <div class="conv-title" [title]="conv.title">{{ truncateTitle(conv.title) }}</div>
             <div class="conv-meta">{{ conv.message_count }} messages</div>
           </div>
+          <button
+            class="btn-delete"
+            (click)="deleteConversation(conv.id, $event)"
+            title="Delete conversation"
+          >
+            ×
+          </button>
         </div>
       }
 
