@@ -26,6 +26,7 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
   showScrollButton = false;
   private isUserAtBottom = true;
   private platformId = inject(PLATFORM_ID);
+  sidebarOpen = false;
 
   constructor(
     private learningService: LearningService,
@@ -48,6 +49,14 @@ export class ChatComponent implements OnInit, AfterViewInit, AfterViewChecked {
       console.error('Markdown parsing error:', error);
       return text;
     }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
   }
 
   ngOnInit(): void {

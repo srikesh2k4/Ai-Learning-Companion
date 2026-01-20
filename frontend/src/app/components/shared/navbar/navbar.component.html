@@ -1,6 +1,11 @@
 <nav class="navbar">
   <div class="navbar-content">
-    <div class="navbar-brand">
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger" [class.open]="mobileMenuOpen"></span>
+    </button>
+
+    <a routerLink="/dashboard" class="navbar-brand">
       <div class="brand-container">
         <h1 class="brand-name">AI Learning Companion</h1>
         <div class="ghost">
@@ -11,8 +16,9 @@
           <div></div>
         </div>
       </div>
-    </div>
+    </a>
 
+    <!-- Desktop Menu -->
     <div class="navbar-menu">
       <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
       <a routerLink="/chat" routerLinkActive="active">Chat</a>
@@ -28,6 +34,27 @@
           <button class="btn-logout" (click)="logout()">Logout</button>
         </div>
       </div>
+    }
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.open]="mobileMenuOpen">
+    <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+      <span class="menu-icon">📊</span> Dashboard
+    </a>
+    <a routerLink="/chat" routerLinkActive="active" (click)="closeMobileMenu()">
+      <span class="menu-icon">💬</span> Chat
+    </a>
+    <a routerLink="/practice" routerLinkActive="active" (click)="closeMobileMenu()">
+      <span class="menu-icon">📝</span> Practice
+    </a>
+    <a routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()">
+      <span class="menu-icon">👤</span> Profile
+    </a>
+    @if (currentUser) {
+      <button class="btn-logout-mobile" (click)="logout(); closeMobileMenu()">
+        <span class="menu-icon">🚪</span> Logout
+      </button>
     }
   </div>
 </nav>

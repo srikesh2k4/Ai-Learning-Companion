@@ -361,6 +361,151 @@ async def get_topics():
         ]
     }
 
+# ============================================================================
+# AI AGENT ENDPOINTS
+# ============================================================================
+
+@app.post("/api/agent/recommendation", response_model=AgentRecommendationResponse)
+async def get_agent_recommendation(
+    request: AgentRecommendationRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get AI agent recommendation based on user context."""
+    try:
+        # Get user stats
+        stats = await LearningService.get_user_stats(db, current_user.id)
+        
+        # Build context for AI
+        context = f"""
+User: {current_user.full_name}
+Current page: {request.current_route}
+Learning goals: {current_user.learning_goals or 'Not set'}
+Total conversations: {stats['total_conversations']}
+Practice sessions: {stats['total_practice_sessions']}
+Completed sessions: {stats['practice_sessions_completed']}
+Average score: {stats['average_score']:.1f}%
+Topics practiced: {', '.join(stats['topics_practiced'][:5]) if stats['topics_practiced'] else 'None yet'}
+"""
+        
+        # Get recommendation from tutor agent
+        tutor = get_tutor_agent()
+        prompt = f"""Based on this user's learning context, provide a brief, helpful recommendation.
+
+{context}
+
+Respond in this exact JSON format:
+{{
+    "quick_tip": "A short motivational tip (1 sentence)",
+    "suggestion": "What the user should do next (2-3 sentences max)",
+    "estimated_time": "Time estimate like '5 min' or '15 min'",
+    "priority": "low" or "medium" or "high",
+    "action_type": "practice" or "review" or "learn" or "break"
+}}
+
+Be encouraging and specific. If they're new, suggest starting with basics. If they've been practicing a lot, maybe suggest a break or review."""
+
+        response = await tutor.get_response(prompt, [])
+        
+        # Parse JSON from response
+        import json
+        import re
+        
+        # Try to extract JSON from response
+        json_match = re.search(r'\{[^{}]*\}', response, re.DOTALL)
+        if json_match:
+            rec_data = json.loads(json_match.group())
+        else:
+            # Default response if parsing fails
+            rec_data = {
+                "quick_tip": "Keep up the great work! Consistency is key to learning.",
+                "suggestion": "Try practicing a new topic or review your recent sessions to reinforce your learning.",
+                "estimated_time": "10 min",
+                "priority": "medium",
+                "action_type": "practice"
+            }
+        
+        return AgentRecommendationResponse(
+            quick_tip=rec_data.get("quick_tip", "Keep learning!"),
+            suggestion=rec_data.get("suggestion", "Try a practice session."),
+            estimated_time=rec_data.get("estimated_time", "10 min"),
+            priority=rec_data.get("priority", "medium"),
+            action_type=rec_data.get("action_type", "practice"),
+            stats=AgentStatsResponse(
+                total_conversations=stats['total_conversations'],
+                total_practice_sessions=stats['total_practice_sessions'],
+                practice_sessions_completed=stats['practice_sessions_completed'],
+                average_score=stats['average_score'],
+                topics_practiced=stats['topics_practiced'][:10]
+            )
+        )
+    except Exception as e:
+        logger.error(f"Agent recommendation error: {e}")
+        # Return default recommendation on error
+        return AgentRecommendationResponse(
+            quick_tip="Ready to learn something new today?",
+            suggestion="Start with a practice session or chat with the AI tutor to explore topics.",
+            estimated_time="10 min",
+            priority="medium",
+            action_type="learn",
+            stats=None
+        )
+
+@app.post("/api/agent/chat", response_model=AgentChatResponse)
+async def agent_chat(
+    request: AgentChatRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Chat with AI agent."""
+    try:
+        # Get user stats for context
+        stats = await LearningService.get_user_stats(db, current_user.id)
+        
+        # Build system context
+        system_context = f"""You are a helpful AI learning assistant for {current_user.full_name}.
+
+User's learning profile:
+- Learning goals: {current_user.learning_goals or 'Not specified'}
+- Topics practiced: {', '.join(stats['topics_practiced'][:5]) if stats['topics_practiced'] else 'None yet'}
+- Practice sessions: {stats['total_practice_sessions']} ({stats['practice_sessions_completed']} completed)
+- Average score: {stats['average_score']:.1f}%
+
+Be helpful, encouraging, and concise. You can:
+- Answer questions about topics they're learning
+- Suggest what to study next
+- Explain concepts simply
+- Provide study tips
+- Motivate them
+
+Keep responses brief (2-4 sentences) unless they ask for detailed explanations.
+Format responses in markdown when helpful."""
+
+        tutor = get_tutor_agent()
+        
+        # Create message history with system context
+        messages = [{"role": "system", "content": system_context}]
+        
+        response = await tutor.get_response(request.message, messages)
+        
+        # Generate follow-up suggestions
+        suggestions = []
+        if "practice" in request.message.lower() or "learn" in request.message.lower():
+            suggestions = ["Start a practice session", "View my progress", "Explore topics"]
+        elif "help" in request.message.lower():
+            suggestions = ["How do I practice?", "What topics can I learn?", "Show my stats"]
+        
+        return AgentChatResponse(
+            message=response,
+            suggestions=suggestions if suggestions else None
+        )
+    except Exception as e:
+        logger.error(f"Agent chat error: {e}")
+        return AgentChatResponse(
+            message="I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+            suggestions=["Try again", "Go to dashboard", "Start practice"]
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

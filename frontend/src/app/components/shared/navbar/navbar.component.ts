@@ -13,6 +13,7 @@ import { User } from '../../../models/types';
 })
 export class NavbarComponent implements OnInit {
   currentUser: User | null = null;
+  mobileMenuOpen = false;
 
   constructor(private authService: AuthService) {}
 
@@ -20,6 +21,14 @@ export class NavbarComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 
   logout(): void {

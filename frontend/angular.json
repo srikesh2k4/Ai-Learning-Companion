@@ -68,6 +68,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": [
+              "vocational-certified-alias-legislature.trycloudflare.com"
+            ]
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"

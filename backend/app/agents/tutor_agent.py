@@ -52,6 +52,25 @@ Guidelines:
         
         result = await self.agent.run(prompt)
         return result.output
+    
+    async def get_response(self, message: str, history: list = None) -> str:
+        """Get response from tutor (alias for chat with history support)."""
+        context = None
+        if history:
+            # Build context from history
+            context_parts = []
+            for msg in history[-5:]:  # Last 5 messages for context
+                role = msg.get('role', 'user')
+                content = msg.get('content', '')
+                if role == 'system':
+                    context_parts.append(f"System: {content}")
+                elif role == 'user':
+                    context_parts.append(f"User: {content}")
+                else:
+                    context_parts.append(f"Assistant: {content}")
+            context = "\n".join(context_parts)
+        
+        return await self.chat(message, context)
 
 _tutor_agent: Optional[TutorAgent] = None
 

@@ -163,3 +163,39 @@ class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
     request_id: Optional[str] = None
+
+# ============================================================================
+# AI AGENT SCHEMAS
+# ============================================================================
+
+class AgentRecommendationRequest(BaseModel):
+    """Request for AI agent recommendation."""
+    current_route: str
+    context: Optional[dict] = None
+
+class AgentStatsResponse(BaseModel):
+    """User stats for agent."""
+    total_conversations: int
+    total_practice_sessions: int
+    practice_sessions_completed: int
+    average_score: float
+    topics_practiced: List[str]
+
+class AgentRecommendationResponse(BaseModel):
+    """AI agent recommendation response."""
+    quick_tip: str
+    suggestion: str
+    estimated_time: str
+    priority: Literal["low", "medium", "high"]
+    action_type: Literal["practice", "review", "learn", "break"]
+    stats: Optional[AgentStatsResponse] = None
+
+class AgentChatRequest(BaseModel):
+    """Request for AI agent chat."""
+    message: str = Field(..., min_length=1, max_length=2000)
+    context: Optional[dict] = None
+
+class AgentChatResponse(BaseModel):
+    """AI agent chat response."""
+    message: str
+    suggestions: Optional[List[str]] = None

@@ -50,9 +50,24 @@ export class AiAgentService {
   }
 
   chat(message: string, currentRoute: string): Observable<AgentChatResponse> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return of({
+        message: "Chat is not available in server-side rendering.",
+        suggestions: []
+      });
+    }
+
     return this.http.post<AgentChatResponse>(
       `${this.apiUrl}/agent/chat`,
-      { message, current_route: currentRoute }
+      { message, context: { route: currentRoute } }
+    ).pipe(
+      catchError((error) => {
+        console.error('Agent chat error:', error);
+        return of({
+          message: "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+          suggestions: ["Try again", "Go to dashboard", "Start practice"]
+        });
+      })
     );
   }
 
