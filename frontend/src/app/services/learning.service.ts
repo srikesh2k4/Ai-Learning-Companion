@@ -11,12 +11,13 @@ import {
   LearningStats,
   SubmitAnswerResponse
 } from '../models/types';
+import { API_CONFIG } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearningService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = API_CONFIG.BASE_URL + '/api';
 
   constructor(private http: HttpClient) {}
 

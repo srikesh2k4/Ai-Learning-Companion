@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, inject, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router';
@@ -15,7 +15,7 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './ai-agent.component.html',
   styleUrl: './ai-agent.component.scss'
 })
-export class AiAgentComponent implements OnInit, OnDestroy {
+export class AiAgentComponent implements OnInit, OnDestroy, AfterViewInit {
   state: 'idle' | 'listening' | 'thinking' | 'speaking' = 'idle';
   isExpanded = false;
   isMinimized = false;
@@ -27,6 +27,15 @@ export class AiAgentComponent implements OnInit, OnDestroy {
 
   recommendation: AgentRecommendation | null = null;
   currentRoute = '';
+
+  // Drag state
+  isDragging = false;
+  dragPosition = { x: 0, y: 0 };
+  private dragOffset = { x: 0, y: 0 };
+  private hasMoved = false;
+
+  @ViewChild('agentContainer') agentContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('minimizedAgent') minimizedAgent!: ElementRef<HTMLDivElement>;
 
   private platformId = inject(PLATFORM_ID);
   private subscriptions: Subscription[] = [];
@@ -76,6 +85,13 @@ export class AiAgentComponent implements OnInit, OnDestroy {
         this.loadContextualRecommendation();
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Set initial position from bottom-right
+    this.resetPosition();
   }
 
   ngOnDestroy(): void {
@@ -189,5 +205,81 @@ export class AiAgentComponent implements OnInit, OnDestroy {
 
   get isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
+  }
+
+  // ========== DRAG FUNCTIONALITY ==========
+
+  private resetPosition(): void {
+    // Default position: bottom-right corner
+    this.dragPosition = { x: 0, y: 0 };
+  }
+
+  onDragStart(event: MouseEvent | TouchEvent): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    event.preventDefault();
+    this.isDragging = true;
+    this.hasMoved = false;
+
+    const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+    const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+
+    // Calculate offset from current position
+    this.dragOffset = {
+      x: clientX - this.dragPosition.x,
+      y: clientY - this.dragPosition.y
+    };
+
+    // Add global listeners
+    document.addEventListener('mousemove', this.onDragMove);
+    document.addEventListener('mouseup', this.onDragEnd);
+    document.addEventListener('touchmove', this.onDragMove, { passive: false });
+    document.addEventListener('touchend', this.onDragEnd);
+  }
+
+  onDragMove = (event: MouseEvent | TouchEvent): void => {
+    if (!this.isDragging) return;
+
+    event.preventDefault();
+
+    const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+    const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+
+    const newX = clientX - this.dragOffset.x;
+    const newY = clientY - this.dragOffset.y;
+
+    // Check if moved enough to count as drag (not just click)
+    if (Math.abs(newX - this.dragPosition.x) > 5 || Math.abs(newY - this.dragPosition.y) > 5) {
+      this.hasMoved = true;
+    }
+
+    // Get viewport bounds
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const agentSize = 100; // Approximate size including suggestion bubble area
+
+    // Constrain to viewport
+    this.dragPosition = {
+      x: Math.max(-viewportWidth + agentSize, Math.min(0, newX)),
+      y: Math.max(-viewportHeight + agentSize, Math.min(0, newY))
+    };
+  };
+
+  onDragEnd = (): void => {
+    this.isDragging = false;
+
+    // Remove global listeners
+    document.removeEventListener('mousemove', this.onDragMove);
+    document.removeEventListener('mouseup', this.onDragEnd);
+    document.removeEventListener('touchmove', this.onDragMove);
+    document.removeEventListener('touchend', this.onDragEnd);
+  };
+
+  onAgentClick(): void {
+    // Only toggle expand if we didn't drag
+    if (!this.hasMoved) {
+      this.toggleExpand();
+    }
+    this.hasMoved = false;
   }
 }

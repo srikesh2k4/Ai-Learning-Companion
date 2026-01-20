@@ -1,27 +1,24 @@
-"""AI Tutor Agent."""
-from pydantic_ai import Agent
+"""AI Tutor Agent using OpenAI ChatGPT."""
 from typing import Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
 import logging
-import os
+from openai import AsyncOpenAI
 
 from ..config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-os.environ['OPENROUTER_API_KEY'] = settings.openrouter_api_key
+# Initialize OpenAI client
+client = AsyncOpenAI(api_key=settings.openai_api_key)
 
 class TutorAgent:
-    """AI Tutor Agent."""
+    """AI Tutor Agent using ChatGPT."""
     
     def __init__(self):
-        # Use OpenRouter model directly
-        self.agent = Agent(
-            'openrouter:nvidia/nemotron-3-nano-30b-a3b:free',
-            system_prompt=self._get_system_prompt()
-        )
-        logger.info("TutorAgent initialized")
+        self.model = settings.openai_model
+        self.system_prompt = self._get_system_prompt()
+        logger.info(f"TutorAgent initialized with model: {self.model}")
     
     @staticmethod
     def _get_system_prompt() -> str:
@@ -45,32 +42,49 @@ Guidelines:
     
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=30))
     async def chat(self, message: str, context: Optional[str] = None) -> str:
-        """Chat with tutor."""
-        prompt = message
-        if context:
-            prompt = f"Context: {context}\n\nStudent: {message}"
+        """Chat with tutor using ChatGPT."""
+        messages = [
+            {"role": "system", "content": self.system_prompt}
+        ]
         
-        result = await self.agent.run(prompt)
-        return result.output
+        if context:
+            messages.append({"role": "user", "content": f"Context: {context}"})
+        
+        messages.append({"role": "user", "content": message})
+        
+        response = await client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=1000,
+            temperature=0.7
+        )
+        
+        return response.choices[0].message.content
     
     async def get_response(self, message: str, history: list = None) -> str:
-        """Get response from tutor (alias for chat with history support)."""
-        context = None
+        """Get response from tutor with history support."""
+        messages = [
+            {"role": "system", "content": self.system_prompt}
+        ]
+        
+        # Add history if provided
         if history:
-            # Build context from history
-            context_parts = []
-            for msg in history[-5:]:  # Last 5 messages for context
+            for msg in history[-10:]:  # Last 10 messages for context
                 role = msg.get('role', 'user')
                 content = msg.get('content', '')
-                if role == 'system':
-                    context_parts.append(f"System: {content}")
-                elif role == 'user':
-                    context_parts.append(f"User: {content}")
-                else:
-                    context_parts.append(f"Assistant: {content}")
-            context = "\n".join(context_parts)
+                if role in ['user', 'assistant', 'system']:
+                    messages.append({"role": role, "content": content})
         
-        return await self.chat(message, context)
+        messages.append({"role": "user", "content": message})
+        
+        response = await client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=1000,
+            temperature=0.7
+        )
+        
+        return response.choices[0].message.content
 
 _tutor_agent: Optional[TutorAgent] = None
 

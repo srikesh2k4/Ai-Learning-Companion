@@ -1,19 +1,19 @@
-"""Problem Generator Agent."""
+"""Problem Generator Agent using OpenAI ChatGPT."""
 from pydantic import BaseModel
-from pydantic_ai import Agent
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
 import logging
-import os
 import json
 import re
+from openai import AsyncOpenAI
 
 from ..config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-os.environ['OPENROUTER_API_KEY'] = settings.openrouter_api_key
+# Initialize OpenAI client
+client = AsyncOpenAI(api_key=settings.openai_api_key)
 
 class GeneratedProblem(BaseModel):
     """Generated problem structure."""
@@ -23,15 +23,12 @@ class GeneratedProblem(BaseModel):
     explanation: str
 
 class ProblemGeneratorAgent:
-    """Problem Generator Agent."""
+    """Problem Generator Agent using ChatGPT."""
     
     def __init__(self):
-        # Use OpenRouter model for text generation (no structured output)
-        self.agent = Agent(
-            'openrouter:nvidia/nemotron-3-nano-30b-a3b:free',
-            system_prompt=self._get_system_prompt()
-        )
-        logger.info("ProblemGeneratorAgent initialized")
+        self.model = settings.openai_model
+        self.system_prompt = self._get_system_prompt()
+        logger.info(f"ProblemGeneratorAgent initialized with model: {self.model}")
     
     @staticmethod
     def _get_system_prompt() -> str:
@@ -108,14 +105,23 @@ RESPOND WITH ONLY JSON, NO OTHER TEXT."""
     
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=30))
     async def generate(self, topic: str, difficulty: str) -> GeneratedProblem:
-        """Generate practice problem."""
+        """Generate practice problem using ChatGPT."""
         prompt = f"""Generate a {difficulty} difficulty practice problem about: {topic}
 
 The problem should be appropriate for a student learning this topic.
 Return ONLY a JSON object with: problem_text, hints (array), solution, explanation"""
         
-        result = await self.agent.run(prompt)
-        return self._parse_response(result.output)
+        response = await client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=1000,
+            temperature=0.7
+        )
+        
+        return self._parse_response(response.choices[0].message.content)
 
 _problem_agent: Optional[ProblemGeneratorAgent] = None
 

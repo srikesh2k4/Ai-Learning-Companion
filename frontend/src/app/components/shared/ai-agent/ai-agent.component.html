@@ -1,7 +1,14 @@
 @if (isAuthenticated) {
   <!-- Minimized Bubble -->
   @if (isMinimized) {
-    <div class="ai-agent-minimized" (click)="toggleExpand()">
+    <div
+      class="ai-agent-minimized"
+      #minimizedAgent
+      [class.dragging]="isDragging"
+      [style.transform]="'translate(' + dragPosition.x + 'px, ' + dragPosition.y + 'px)'"
+      (mousedown)="onDragStart($event)"
+      (touchstart)="onDragStart($event)"
+      (click)="onAgentClick()">
       <div class="mini-orb">
         <div class="mini-glow"></div>
         <div class="mini-core"></div>
@@ -11,8 +18,17 @@
 
   <!-- Floating Agent -->
   @if (!isMinimized && !isExpanded) {
-    <div class="ai-agent-container" [class]="state">
-      <div class="ai-agent" (click)="toggleExpand()">
+    <div
+      class="ai-agent-container"
+      #agentContainer
+      [class]="state"
+      [class.dragging]="isDragging"
+      [style.transform]="'translate(' + dragPosition.x + 'px, ' + dragPosition.y + 'px)'">
+      <div
+        class="ai-agent"
+        (mousedown)="onDragStart($event)"
+        (touchstart)="onDragStart($event)"
+        (click)="onAgentClick()">
         <div class="agent-glow"></div>
         <div class="agent-core">
           <div class="agent-face">
@@ -24,7 +40,7 @@
       </div>
 
       @if (currentSuggestion) {
-        <div class="suggestion-bubble" (click)="toggleExpand()">
+        <div class="suggestion-bubble" (click)="onAgentClick()">
           <p>{{ currentSuggestion }}</p>
           <span class="tap-hint">Tap to expand</span>
         </div>

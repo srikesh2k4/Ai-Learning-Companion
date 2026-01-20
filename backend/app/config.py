@@ -15,10 +15,9 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite+aiosqlite:///./learning.db"
     
-    # OpenRouter
-    openrouter_api_key: str
-    primary_model: str = "openrouter/nvidia/nemotron-3-nano-30b-a3b:free"
-    fallback_model: str = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+    # OpenAI (ChatGPT)
+    openai_api_key: str
+    openai_model: str = "gpt-4o"  # Options: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
     
     # JWT
     secret_key: str

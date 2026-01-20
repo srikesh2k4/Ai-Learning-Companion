@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { catchError, map } from 'rxjs/operators';
+import { API_CONFIG } from '../config/api.config';
 
 export interface AgentRecommendation {
   quick_tip: string;
@@ -28,7 +29,7 @@ export interface AgentChatResponse {
   providedIn: 'root'
 })
 export class AiAgentService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = API_CONFIG.BASE_URL + '/api';
   private platformId = inject(PLATFORM_ID);
 
   private contextSubject = new BehaviorSubject<any>(null);

@@ -6,7 +6,9 @@ python-multipart>=0.0.12
 # Pydantic
 pydantic>=2.11.0
 pydantic-settings>=2.6.1
-pydantic-ai>=0.0.14
+
+# OpenAI ChatGPT
+openai>=1.40.0
 
 # Database
 sqlalchemy[asyncio]>=2.0.35
